@@ -13,7 +13,7 @@ function main () {
     "yellow",
     "orange"
   ];
-  let interval = 1000;
+  let interval = 500;
 
   // setup initial grid of color squares
   let grid = initGrid(canvas, squareSize, colors);
@@ -52,15 +52,25 @@ function updateGrid (grid, colors) {
   @return null
 */
 function updateSquare (grid, x, y, colors) {
+  let threshold = 3;
   let adjacent = neighborColors(grid, x, y);
+  let replacements = [];
   if (randomChance(1, 1000)) {
-    grid[x][y].color = randomElement(colors);
+    replacements.push(randomElement(colors));
   } else {
     for (let color in adjacent) {
-      if (adjacent[color] >= 3) {
-        grid[x][y].color = color;
+      let colorCount = adjacent[color];
+      if (colorCount === threshold) {
+        replacements.push(color);
+      }
+      else if (colorCount > threshold) {
+        replacements = [color];
+        threshold = colorCount;
       }
     }
+  }
+  if (replacements.length > 0) {
+    grid[x][y].color = randomElement(replacements);
   }
 };
 
@@ -119,13 +129,12 @@ function draw (canvas, grid) {
   @return {Object}     key of colors with occurance value as int and "total"
 */
 function neighborColors (grid, x, y) {
-  let colors = { "total": 0 };
+  let colors = {};
   neighbors(grid, x, y).forEach(function (square) {
     if (!(square.color in colors)) {
       colors[square.color] = 0;
     }
     colors[square.color] += 1;
-    colors["total"] += 1;
   });
   return colors;
 };
