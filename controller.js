@@ -53,12 +53,13 @@ function updateGrid (grid, colors) {
 */
 function updateSquare (grid, x, y, colors) {
   let threshold = 3;
-  let adjacent = neighborColors(grid, x, y);
   let replacements = [];
-  if (randomChance(1, 1000)) {
-    replacements.push(randomElement(colors));
-  } else {
-    for (let color in adjacent) {
+  let currentColor = grid[x][y].color;
+  let adjacent = neighborColors(grid, x, y);
+
+  // find different adjacent color(s) with greatest frequency above threshold
+  for (let color in adjacent) {
+    if (color !== currentColor) {
       let colorCount = adjacent[color];
       if (colorCount === threshold) {
         replacements.push(color);
@@ -69,8 +70,17 @@ function updateSquare (grid, x, y, colors) {
       }
     }
   }
+
+  // square can be taken over by a new color
   if (replacements.length > 0) {
-    grid[x][y].color = randomElement(replacements);
+
+    // randomize a chance to not be taken over
+    if (randomChance(350, 1000)) {
+      grid[x][y].color = randomElement(colors);
+    }
+    else {
+      grid[x][y].color = randomElement(replacements);
+    }
   }
 };
 
