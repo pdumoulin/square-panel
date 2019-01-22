@@ -73,7 +73,6 @@ function updateSquare (grid, x, y, colors) {
 
   // square can be taken over by a new color
   if (replacements.length > 0) {
-
     // randomize a chance to not be taken over
     if (randomChance(350, 1000)) {
       grid[x][y].color = randomElement(colors);
@@ -164,9 +163,22 @@ function neighbors (grid, x, y) {
       if (xOffset !== 0 || yOffset !== 0) {
         let xCoord = x + xOffset;
         let yCoord = y + yOffset;
-        if (xCoord > -1 && xCoord < numRows && yCoord > -1 && yCoord < numCols) {
-          results.push(grid[xCoord][yCoord]);
+
+        // handle wrapping around bounds
+        if (xCoord < 0) {
+          xCoord = numRows - 1;
         }
+        else if (xCoord === numRows) {
+          xCoord = 0;
+        }
+        if (yCoord < 0) {
+          yCoord = numCols - 1;
+        }
+        else if (yCoord === numCols) {
+          yCoord = 0;
+        }
+
+        results.push(grid[xCoord][yCoord]);
       }
     }
   }
