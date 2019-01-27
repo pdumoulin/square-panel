@@ -19,9 +19,12 @@ function main () {
   let grid = initGrid(canvas, squareSize, colors);
   draw(canvas, grid);
 
+  // optionally change update algorithm's forgiveness
+  let weight = getUrlParameter("weight");
+
   // every interval, update all squares and re-draw
   setInterval(function () {
-    updateGrid(grid, colors);
+    updateGrid(grid, colors, weight);
     draw(canvas, grid);
   }, interval);
 };
@@ -32,14 +35,18 @@ function main () {
   @param {Array}       colors all possible colors for a square
   @return null
 */
-function updateGrid (grid, colors) {
+function updateGrid (grid, colors, weight) {
   let numRows = grid.length;
   let numCols = grid[0].length;
   let squareIndexes = shuffle(range(0, numRows * numCols));
+  let gridColorCounts = colorCounter(grid);
+  Object.keys(gridColorCounts).forEach(function (key) {
+    gridColorCounts[key] /= (numRows * numCols);
+  });
   squareIndexes.forEach(function (index) {
     let x = Math.floor(index / numCols);
     let y = Math.floor(index % numCols);
-    updateSquare(grid, x, y, colors);
+    updateSquare(grid, x, y, colors, gridColorCounts, weight);
   });
 };
 
@@ -49,15 +56,35 @@ function updateGrid (grid, colors) {
   @param {Int}         x      row index of square in grid
   @param {Int}         y      column index of square in grid
   @param {Array}       colors all possible colors for a square
+  @param {Object}      gridColorPercents percent of each color as part of grid
   @return null
 */
-function updateSquare (grid, x, y, colors) {
-  let threshold = 3;
-  let replacements = [];
+function updateSquare (grid, x, y, colors, gridColorPercents, weight) {
   let currentColor = grid[x][y].color;
+
+  // change chance of color not being changed based on algorithm
+  if (weight === "progressive") {
+    if (randomChance(100 - (gridColorPercents[currentColor] * 100), 100)) {
+      return;
+    }
+  }
+  else if (weight === "regressive") {
+    if (randomChance((gridColorPercents[currentColor] * 100), 100)) {
+      return;
+    }
+  }
+  else if (weight === "random") {
+    if (randomChance(Math.random() * 100, 100)) {
+      return;
+    }
+  }
+
+  // find nearby neighbors color distribution
   let adjacent = colorCounter(neighbors(grid, x, y));
 
   // find different adjacent color(s) with greatest frequency above threshold
+  let threshold = 3;
+  let replacements = [];
   for (let color in adjacent) {
     if (color !== currentColor) {
       let colorCount = adjacent[color];
@@ -74,12 +101,7 @@ function updateSquare (grid, x, y, colors) {
   // square can be taken over by a new color
   if (replacements.length > 0) {
     // randomize a chance to not be taken over
-    if (randomChance(350, 1000)) {
-      grid[x][y].color = randomElement(colors);
-    }
-    else {
-      grid[x][y].color = randomElement(replacements);
-    }
+    grid[x][y].color = randomElement(replacements);
   }
 };
 
@@ -227,12 +249,24 @@ function randomChance (percent, total) {
 };
 
 /*
-  Chose a random element from a list
+  Choose a random element from a list
   @param {Array} list of elements to select from
   @param {Any}   element which was selected
 */
 function randomElement (array) {
   return array[Math.floor(Math.random() * array.length)];
+};
+
+/*
+  Extract a URL param value
+  @param {String}  name of URL param to find
+  @return {String} value of URL param by name
+*/
+function getUrlParameter (name) {
+  name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
+  let regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+  let results = regex.exec(window.location.search);
+  return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 };
 
 /*
