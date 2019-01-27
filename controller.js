@@ -57,6 +57,7 @@ function updateGrid (grid, colors, weight) {
   @param {Int}         y      column index of square in grid
   @param {Array}       colors all possible colors for a square
   @param {Object}      gridColorPercents percent of each color as part of grid
+  @param {String}      weight algorithm change for protection against take over
   @return null
 */
 function updateSquare (grid, x, y, colors, gridColorPercents, weight) {
