@@ -55,7 +55,7 @@ function updateSquare (grid, x, y, colors) {
   let threshold = 3;
   let replacements = [];
   let currentColor = grid[x][y].color;
-  let adjacent = neighborColors(grid, x, y);
+  let adjacent = colorCounter(neighbors(grid, x, y));
 
   // find different adjacent color(s) with greatest frequency above threshold
   for (let color in adjacent) {
@@ -131,19 +131,24 @@ function draw (canvas, grid) {
 };
 
 /*
-  Number of each color in adjacent neigbors in grid along with total adjacent
-  @param {DoubleArray} grid   rectangular grid of squares
-  @param {Int}         x      row index of square in grid
-  @param {Int}         y      column index of square in grid
-  @return {Object}     key of colors with occurance value as int and "total"
+  Counts instances of colors in array or double array
+  @param {Array}  list array of squares
+  @param {Object} key of colors with count of occurance in list
 */
-function neighborColors (grid, x, y) {
-  let colors = {};
-  neighbors(grid, x, y).forEach(function (square) {
-    if (!(square.color in colors)) {
-      colors[square.color] = 0;
+function colorCounter (list, colors) {
+  if (!(colors)) {
+    colors = {};
+  }
+  list.forEach(function (element) {
+    if (element instanceof Array) {
+      colors = colorCounter(element, colors);
     }
-    colors[square.color] += 1;
+    else {
+      if (!(element.color in colors)) {
+        colors[element.color] = 0;
+      }
+      colors[element.color] += 1;
+    }
   });
   return colors;
 };
