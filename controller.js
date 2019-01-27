@@ -24,7 +24,7 @@ function main () {
 
   // every interval, update all squares and re-draw
   setInterval(function () {
-    updateGrid(grid, colors, weight);
+    updateGrid(grid, weight);
     draw(canvas, grid);
   }, refresh);
 };
@@ -35,7 +35,7 @@ function main () {
   @param {Array}       colors all possible colors for a square
   @return null
 */
-function updateGrid (grid, colors, weight) {
+function updateGrid (grid, weight) {
   let numRows = grid.length;
   let numCols = grid[0].length;
   let squareIndexes = shuffle(range(0, numRows * numCols));
@@ -46,7 +46,7 @@ function updateGrid (grid, colors, weight) {
   squareIndexes.forEach(function (index) {
     let x = Math.floor(index / numCols);
     let y = Math.floor(index % numCols);
-    updateSquare(grid, x, y, colors, gridColorCounts, weight);
+    updateSquare(grid, x, y, gridColorCounts, weight);
   });
 };
 
@@ -55,12 +55,11 @@ function updateGrid (grid, colors, weight) {
   @param {DoubleArray} grid   rectangular grid of squares
   @param {Int}         x      row index of square in grid
   @param {Int}         y      column index of square in grid
-  @param {Array}       colors all possible colors for a square
   @param {Object}      gridColorPercents percent of each color as part of grid
   @param {String}      weight algorithm change for protection against take over
   @return null
 */
-function updateSquare (grid, x, y, colors, gridColorPercents, weight) {
+function updateSquare (grid, x, y, gridColorPercents, weight) {
   let currentColor = grid[x][y].color;
 
   // change chance of color not being changed based on algorithm
