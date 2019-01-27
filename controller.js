@@ -3,9 +3,13 @@
   Execution point after DOM has loaded
 */
 function main () {
-  // config options
+  // optional parameters
+  let weight = getUrlParameter("weight") || "none";
+  let squareSize = parseInt(getUrlParameter("squareSize") || 5);
+  let refresh = parseInt(getUrlParameter("refresh") || 500);
+
+  // canvas element and color options
   let canvas = document.getElementById("canvas");
-  let squareSize = 5;
   let colors = [
     "green",
     "blue",
@@ -13,20 +17,16 @@ function main () {
     "yellow",
     "orange"
   ];
-  let interval = 500;
 
   // setup initial grid of color squares
   let grid = initGrid(canvas, squareSize, colors);
   draw(canvas, grid);
 
-  // optionally change update algorithm's forgiveness
-  let weight = getUrlParameter("weight");
-
   // every interval, update all squares and re-draw
   setInterval(function () {
     updateGrid(grid, colors, weight);
     draw(canvas, grid);
-  }, interval);
+  }, refresh);
 };
 
 /*
