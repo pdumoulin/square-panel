@@ -2,7 +2,7 @@
 
 Inspired by: John F. Simon Jr. (b. 1963), Color Panel v1.0, 1999
 
-![Example Screenshot](/screenshots/example.png?raw=true)
+![See it Live in Action!](https://pdumoulin.github.io/square-panel/)
 
 ## Parameters
 URL parameters available.
